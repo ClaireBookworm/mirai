@@ -12,8 +12,8 @@ from config import Config
 import utils
 #import mrcnn.model as modellib
 
-import matterport_mask_rcnn as modellib
-from matterport_mask_rcnn import load_image_gt
+import mask_rcnn as modellib
+from mask_rcnn import load_image_gt
 
 
 def load_image(image, config, augment=False, augmentation=None,
