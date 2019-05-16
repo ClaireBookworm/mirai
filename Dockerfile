@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow:1.12.0-gpu
 WORKDIR /model
 
-RUN apt update && apt install -y wget
+RUN apt update && apt install -y wget python-tk
 
 COPY source/requirements.txt .
 RUN pip install -r requirements.txt
