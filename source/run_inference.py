@@ -56,7 +56,7 @@ def make_masked_image(image, boxes, masks, class_ids, class_names,
 
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
-        color = 'red'
+        color = [1,0,0]
 
         mask = np.array(masks[i])
         if show_mask:
