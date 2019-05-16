@@ -53,7 +53,22 @@ def load_image(image, config, augment=False, augmentation=None,
 class InferenceConfig(Config):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    DETECTION_MIN_CONFIDENCE = 0.95
+    DETECTION_MIN_CONFIDENCE = 0.5
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    BATCH_SIZE = 1
+
+    # Number of classes (including background)
+    NUM_CLASSES = 1 + 5 # background + 5 shapes
+
+    # Use small images for faster training. Set the limits of the small side
+    # the large side, and that determines the image shape.
+    IMAGE_MIN_DIM = 4
+    IMAGE_MAX_DIM = 1024
+
+    # Use smaller anchors because our image and objects are small
+    #RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
+    RPN_ANCHOR_SCALES = (12, 32, 80, 196, 480)
     
 inference_config = InferenceConfig()
 
@@ -64,12 +79,12 @@ class_names = ['BG', "Tumor", "Empty1", "Empty2",
 inference_config = InferenceConfig()
 
 
-model_path = ''
+model_path = 'weights.h5'
 
 def process(original_image, model_path, inference_config, class_names, polygon=True):
     model = modellib.MaskRCNN(mode="inference", 
                                   config=inference_config,
-                                  model_dir=model_path)
+                                  model_dir='./')
 
     # Load trained weights
     #print("Loading weights from ", model_path)
@@ -96,3 +111,5 @@ def process(original_image, model_path, inference_config, class_names, polygon=T
             resized = convert_mask_to_polygon(resized)
         resized_masks.append(resized)
     return rois, resized_masks, class_ids, scores
+  
+
