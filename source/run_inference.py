@@ -37,36 +37,22 @@ def apply_mask(image, mask, color, alpha=0.5):
 def make_masked_image(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
-                      show_mask=True, show_bbox=True,
-                      colors=None, captions=None):
+                      show_mask=True, 
+                      colors=None, ):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
     class_ids: [num_instances]
     class_names: list of class names of the dataset
     scores: (optional) confidence scores for each box
-    title: (optional) Figure title
-    show_mask, show_bbox: To show masks and bounding boxes or not
-    figsize: (optional) the size of the image
-    colors: (optional) An array or colors to use with each object
-    captions: (optional) A list of strings to use as captions for each object
+
     """
     # Number of instances
-    N = boxes.shape[0]
-    if not N:
+    try:
+        N =  len(masks)
+    except:
         print("\n*** No instances to display *** \n")
-    else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
-
-
-
-    # Show area outside image boundaries.
-    height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
-    ax.axis('off')
-    ax.set_title(title)
 
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
@@ -199,7 +185,7 @@ if __name__ == "__main__":
       inference_config=inference_config,
       class_names=class_names,
       polygon=False)
-  
+  print masks
   masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
   image_string = save_image_in_memory(masked_image)
   open('/output/output.jpg', 'wb').write(image_string)
