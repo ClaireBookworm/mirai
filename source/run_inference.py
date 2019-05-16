@@ -33,10 +33,9 @@ def apply_mask(image, mask, color, alpha=0.5):
                                   (1 - alpha) + alpha * color[c] * 255,
                                   image[:, :, c])
     """
-    new_mask = np.zeros((image.shape[0], image.shape[1], 3)
-    new_mask[:,:,0] = mask*255
-    image[:,:,0] = image[:,:,0]*0.5 + new_mask*0.5
-    return image+new_mask
+    mask = mask*255*alpha
+    image[:,:,0] = image[:,:,0]*(1.0-alpha) + mask*alpha
+    return image
 
 
 def make_masked_image(image, boxes, masks, class_ids, class_names,
