@@ -95,4 +95,4 @@ def process(original_image, model_path, inference_config, class_names, polygon=T
         if polygon:
             resized = convert_mask_to_polygon(resized)
         resized_masks.append(resized)
-    return rois, masks, class_ids, scores
+    return rois, resized_masks, class_ids, scores
