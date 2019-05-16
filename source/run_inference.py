@@ -16,6 +16,13 @@ import mask_rcnn as modellib
 from mask_rcnn import load_image_gt
 
 
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.2
+sess = tf.Session(config=config)
+set_session(sess)  # set this TensorFlow session as the default session for Keras
+
 def load_image(image, config, augment=False, augmentation=None,
                   use_mini_mask=False, debug=False):
     """Load and return ground truth data for an image (image, mask, bounding boxes).
