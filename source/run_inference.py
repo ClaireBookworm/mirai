@@ -57,7 +57,7 @@ class InferenceConfig(Config):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
     BATCH_SIZE = 1
-
+    NAME = 'test'
     # Number of classes (including background)
     NUM_CLASSES = 1 + 5 # background + 5 shapes
 
