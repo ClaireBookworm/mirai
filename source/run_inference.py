@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 import numpy as np
@@ -15,6 +16,7 @@ import utils
 import mask_rcnn as modellib
 from mask_rcnn import load_image_gt
 
+from scipy.misc import imsave
 
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
