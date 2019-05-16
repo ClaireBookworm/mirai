@@ -26,12 +26,17 @@ set_session(sess)  # set this TensorFlow session as the default session for Kera
 def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
     """
+    """
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
                                   image[:, :, c] *
                                   (1 - alpha) + alpha * color[c] * 255,
                                   image[:, :, c])
-    return image
+    """
+    new_mask = np.zeros((image.shape[0], image.shape[1], 3)
+    new_mask[:,:,0] = mask*255
+    image[:,:,0] = image[:,:,0]*0.5 + new_mask*0.5
+    return image+new_mask
 
 
 def make_masked_image(image, boxes, masks, class_ids, class_names,
