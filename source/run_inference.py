@@ -267,7 +267,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.save('/output/output.jpg')
+    plt.savefig('/output/output.jpg')
     
 if __name__ == "__main__":
   test_image_path = 'test_images/test_1.jpg'
