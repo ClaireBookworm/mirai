@@ -177,15 +177,15 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     for k, score in zip(r['class_ids'], r['scores']):
         print k,dataset.class_names[k],':',score
     
-
+    """
     resized_masks = []
     for i in range(r['masks'].shape[-1]):
         resized = np.array(utils.resize(r['masks'][:,:,i], original_image.shape), dtype=np.int)
         if polygon:
             resized = convert_mask_to_polygon(resized)
         resized_masks.append(resized)
-    """
-    return rois, masks, class_ids, scores
+    
+    return rois, resized_masks, class_ids, scores, original_image
   
 if __name__ == "__main__":
   test_image_path = 'test_images/test_1.jpg'
@@ -193,12 +193,12 @@ if __name__ == "__main__":
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
   inference_config = InferenceConfig()
-  rois, masks, class_ids, scores = process(
+  rois, masks, class_ids, scores, original_image = process(
       original_image=test_image_path,
       model_path=model_path,
       inference_config=inference_config,
       class_names=class_names,
       polygon=False)
   
-masked_image = make_masked_image(image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
-image_string = save_image_in_memory(masked_image)
+  masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
+  image_string = save_image_in_memory(masked_image)
