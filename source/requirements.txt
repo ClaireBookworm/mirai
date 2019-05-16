@@ -1,1 +1,2 @@
 keras==2.*
+skimage
