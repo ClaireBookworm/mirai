@@ -63,6 +63,7 @@ def make_masked_image(image, boxes, masks, class_ids, class_names,
         color = [1,0,0]
         if class_ids[i] == 1:
             mask = np.array(masks[i])
+            print mask.shape
             if show_mask:
                masked_image = apply_mask(masked_image, mask, color)
 
