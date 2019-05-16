@@ -81,7 +81,7 @@ inference_config = InferenceConfig()
 
 model_path = 'weights.h5'
 
-def process(original_image, model_path, inference_config, class_names, polygon=True):
+def process(original_image, model_path, inference_config, class_names, polygon=False):
     model = modellib.MaskRCNN(mode="inference", 
                                   config=inference_config,
                                   model_dir='./')
@@ -118,5 +118,9 @@ if __name__ == "__main__":
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
   inference_config = InferenceConfig()
-  rois, resized_masks, class_ids, scores = process(original_image=test_image_path, model_path=model_path, inference_config=inference_config, 
-          class_names=class_names, polygon=True)
+  rois, resized_masks, class_ids, scores = process(
+      original_image=test_image_path,
+      model_path=model_path,
+      inference_config=inference_config,
+      class_names=class_names,
+      polygon=False)
