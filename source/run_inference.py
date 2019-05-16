@@ -33,7 +33,7 @@ def apply_mask(image, mask, color, alpha=0.5):
                                   (1 - alpha) + alpha * color[c] * 255,
                                   image[:, :, c])
     """
-    mask = mask*255*alpha
+    mask = mask[:,:,0]*255*alpha
     image[:,:,0] = image[:,:,0]*(1.0-alpha) + mask*alpha
     return image
 
