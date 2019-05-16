@@ -115,7 +115,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     return rois, resized_masks, class_ids, scores
   
 if __name__ == "__main__":
-  test_image_path = 'test_images/test1.jpg'
+  test_image_path = 'test_images/test_1.jpg'
   model_path = 'weights.h5'
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
