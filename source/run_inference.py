@@ -202,3 +202,4 @@ if __name__ == "__main__":
   
   masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
   image_string = save_image_in_memory(masked_image)
+  open('/output/output.jpg', 'wb').write(image_string)
