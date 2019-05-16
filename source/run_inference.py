@@ -1,9 +1,13 @@
 import io
 import os
 import sys
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import skimage
 from skimage.measure import find_contours
+
+
 import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
