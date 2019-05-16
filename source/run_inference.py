@@ -23,6 +23,61 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.2
 sess = tf.Session(config=config)
 set_session(sess)  # set this TensorFlow session as the default session for Keras
 
+def apply_mask(image, mask, color, alpha=0.5):
+    """Apply the given mask to the image.
+    """
+    for c in range(3):
+        image[:, :, c] = np.where(mask == 1,
+                                  image[:, :, c] *
+                                  (1 - alpha) + alpha * color[c] * 255,
+                                  image[:, :, c])
+    return image
+
+
+def make_masked_image(image, boxes, masks, class_ids, class_names,
+                      scores=None, title="",
+                      figsize=(16, 16), ax=None,
+                      show_mask=True, show_bbox=True,
+                      colors=None, captions=None):
+    """
+    boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
+    masks: [height, width, num_instances]
+    class_ids: [num_instances]
+    class_names: list of class names of the dataset
+    scores: (optional) confidence scores for each box
+    title: (optional) Figure title
+    show_mask, show_bbox: To show masks and bounding boxes or not
+    figsize: (optional) the size of the image
+    colors: (optional) An array or colors to use with each object
+    captions: (optional) A list of strings to use as captions for each object
+    """
+    # Number of instances
+    N = boxes.shape[0]
+    if not N:
+        print("\n*** No instances to display *** \n")
+    else:
+        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+
+
+
+
+    # Show area outside image boundaries.
+    height, width = image.shape[:2]
+    ax.set_ylim(height + 10, -10)
+    ax.set_xlim(-10, width + 10)
+    ax.axis('off')
+    ax.set_title(title)
+
+    masked_image = image.astype(np.uint32).copy()
+    for i in range(N):
+        color = 'red'
+
+        mask = masks[:, :, i]
+        if show_mask:
+            masked_image = apply_mask(masked_image, mask, color)
+
+    return masked_image
+  
 def load_image(image, config, augment=False, augmentation=None,
                   use_mini_mask=False, debug=False):
     """Load and return ground truth data for an image (image, mask, bounding boxes).
@@ -88,6 +143,16 @@ inference_config = InferenceConfig()
 
 model_path = 'weights.h5'
 
+def save_image_in_memory(image, data_format='channels_first'):
+   if data_format == 'channels_first':
+       image = np.transpose(image, [1, 2, 0])  # CHW --> HWC
+   image *= 255
+   image = np.clip(image, 0, 255)
+   imgByteArr = io.BytesIO()
+   imsave(imgByteArr, image.astype(np.uint8), 'JPEG')
+   imgByteArr = imgByteArr.getvalue()
+   return imgByteArr
+  
 def process(original_image, model_path, inference_config, class_names, polygon=False):
     model = modellib.MaskRCNN(mode="inference", 
                                   config=inference_config,
@@ -111,7 +176,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     print 'num detections:', len(class_names)
     for k, score in zip(r['class_ids'], r['scores']):
         print k,dataset.class_names[k],':',score
-    """
+    
 
     resized_masks = []
     for i in range(r['masks'].shape[-1]):
@@ -119,7 +184,8 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
         if polygon:
             resized = convert_mask_to_polygon(resized)
         resized_masks.append(resized)
-    return rois, resized_masks, class_ids, scores
+    """
+    return rois, masks, class_ids, scores
   
 if __name__ == "__main__":
   test_image_path = 'test_images/test_1.jpg'
@@ -127,9 +193,12 @@ if __name__ == "__main__":
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
   inference_config = InferenceConfig()
-  rois, resized_masks, class_ids, scores = process(
+  rois, masks, class_ids, scores = process(
       original_image=test_image_path,
       model_path=model_path,
       inference_config=inference_config,
       class_names=class_names,
       polygon=False)
+  
+masked_image = make_masked_image(image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
+image_string = save_image_in_memory(masked_image)
