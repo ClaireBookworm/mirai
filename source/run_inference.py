@@ -112,4 +112,11 @@ def process(original_image, model_path, inference_config, class_names, polygon=T
         resized_masks.append(resized)
     return rois, resized_masks, class_ids, scores
   
-
+if __name__ == "__main__":
+  test_image_path = 'test1.jpg'
+  model_path = 'weights.h5'
+  class_names = ['BG', "Tumor", "Empty1", "Empty2",
+                    "Empty3", "Empty4"]
+  inference_config = InferenceConfig()
+  process(original_image=test_image_path, model_path=model_path, inference_config=inference_config, 
+          class_names=class_names, polygon=True)
