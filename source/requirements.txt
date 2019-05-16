@@ -1,2 +1,3 @@
 keras==2.*
 scikit-image
+ai-integration==1.0.6
