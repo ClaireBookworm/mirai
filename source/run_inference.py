@@ -2,7 +2,7 @@ import os
 import sys
 import numpy as np
 import skimage
-
+from PIL import  Image
 # Root directory of the project
 ROOT_DIR = os.path.abspath(".")
 
@@ -89,7 +89,9 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     # Load trained weights
     #print("Loading weights from ", model_path)
     model.load_weights(model_path, by_name=True)
-
+    
+    original_image = Image.open(img_urls[2]).convert('RGB')
+    original_image = load_image(np.array(original_image), config)
     results = model.detect([original_image], verbose=1)
 
     r = results[0]
