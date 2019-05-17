@@ -1,5 +1,7 @@
+import colorsys
 import io
 import os
+import random
 import sys
 import matplotlib
 matplotlib.use('Agg')
@@ -46,6 +48,7 @@ def apply_mask(image, mask, color, alpha=0.5):
     mask = mask[:,:,0]*255*alpha
     image[:,:,0] = image[:,:,0]*(1.0-alpha) + mask*alpha
     return image
+
 
 def random_colors(N, bright=True):
     """
