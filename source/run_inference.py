@@ -171,14 +171,7 @@ def save_image_in_memory(image, data_format='channels_first'):
     return imgByteArr
 
 
-def process(original_image_bytes, model_path, inference_config, class_names, polygon=False):
-    model = modellib.MaskRCNN(mode="inference",
-                              config=inference_config,
-                              model_dir='./')
-
-    # Load trained weights
-    # print("Loading weights from ", model_path)
-    model.load_weights(model_path, by_name=True)
+def process(original_image_bytes,  inference_config, class_names, polygon=False):
 
     original_image = Image.open(io.BytesIO(original_image_bytes)).convert('RGB')
     unscaled_img = original_image
@@ -318,6 +311,16 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
 
 
 if __name__ == "__main__":
+    inference_config = InferenceConfig()
+    model = modellib.MaskRCNN(mode="inference",
+                              config=inference_config,
+                              model_dir='./')
+    model_path = 'weights.h5'
+
+    # Load trained weights
+    # print("Loading weights from ", model_path)
+    model.load_weights(model_path, by_name=True)
+
 
     while True:
         with ai_integration.get_next_input(inputs_schema={
@@ -326,13 +329,11 @@ if __name__ == "__main__":
             }
         }) as inputs_dict:
 
-            model_path = 'weights.h5'
             class_names = ['BG', "Tumor", "Empty1", "Empty2",
                            "Empty3", "Empty4"]
-            inference_config = InferenceConfig()
+
             rois, masks, class_ids, scores, original_image, unscaled_img = process(
                 original_image_bytes=inputs_dict['image'],
-                model_path=model_path,
                 inference_config=inference_config,
                 class_names=class_names,
                 polygon=False)
