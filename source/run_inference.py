@@ -305,7 +305,6 @@ if __name__ == "__main__":
   else:
       assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
-  masked_image = image.astype(np.uint32).copy()
   polygons = []
 
   for i in range(N):
