@@ -196,7 +196,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
 
         resized_masks.append(resized)
 
-    return rois, masks, class_ids, scores, original_image
+    return rois, resized_masks, class_ids, scores, original_image
   
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
