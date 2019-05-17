@@ -281,7 +281,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
-    #ax.imshow(masked_image.astype(np.uint8))
+    ax.imshow(masked_image.astype(np.uint8))
     plt.savefig('/output/output.jpg')
     
 if __name__ == "__main__":
