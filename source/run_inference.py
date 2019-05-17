@@ -201,7 +201,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
   
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
-                      figsize=(16, 16), ax=None,
+                      figsize=(10.6666, 10.6666), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None):
     """
