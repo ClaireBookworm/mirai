@@ -309,7 +309,7 @@ if __name__ == "__main__":
           # Skip this instance. Has no bbox. Likely lost in image cropping.
           continue
       y1, x1, y2, x2 = boxes[i]
-      mask = masks[:, :, i]
+      mask = masks[i]
 
       # Mask Polygon
       # Pad to ensure proper polygons for masks that touch image edges.
