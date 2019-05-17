@@ -290,11 +290,15 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
     in_width, in_height = unscaled_img.size
     out_width, out_height = im.size  # Get dimensions
 
+    print "in_width {}, in_height {}".format(in_width, in_height)
+    print "out_width {}, out_height {}".format(out_width, out_height)
+
     left = (out_width - in_width) / 2
     top = (out_height - in_height) / 2
     right = (out_width + in_width) / 2
     bottom = (out_height + in_height) / 2
 
+    print "left {}, top {}, right {}, bottom {}".format(left, top, right, bottom)
     im = im.crop((left, top, right, bottom))
     with io.BytesIO() as output:
         im.save(output, format="PNG")
