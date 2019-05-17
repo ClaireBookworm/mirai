@@ -292,16 +292,51 @@ if __name__ == "__main__":
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
   inference_config = InferenceConfig()
-  rois, masks, class_ids, scores, original_image = process(
+  boxes, masks, class_ids, scores, original_image = process(
       original_image=test_image_path,
       model_path=model_path,
       inference_config=inference_config,
       class_names=class_names,
       polygon=False)
+
+  N = boxes.shape[0]
+  if not N:
+      print("\n*** No instances to display *** \n")
+  else:
+      assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+
+  masked_image = image.astype(np.uint32).copy()
+  polygons = []
+
+  for i in range(N):
+
+      # Bounding box
+      if not np.any(boxes[i]):
+          # Skip this instance. Has no bbox. Likely lost in image cropping.
+          continue
+      y1, x1, y2, x2 = boxes[i]
+      mask = masks[:, :, i]
+
+      # Mask Polygon
+      # Pad to ensure proper polygons for masks that touch image edges.
+      padded_mask = np.zeros((mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
+      padded_mask[1:-1, 1:-1] = mask
+      contours = find_contours(padded_mask, 0.5)
+      for verts in contours:
+          # Subtract the padding and flip (y, x) to (x, y)
+          verts = np.fliplr(verts) - 1
+          polygons.append(list(verts))
+
+  print polygons
   #print masks
-  #masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
+  #masked_image = make_masked_image(original_image, boxes=boxes, masks=masks, class_ids=class_ids, class_names=class_names)
   #print "masked_image"
   #print masked_image
   #image_string = save_image_in_memory(masked_image)
-  image_string = display_instances(original_image, rois, masks, class_ids, class_names)
-  open('/output/output.jpg', 'wb').write(image_string)
+  #image_string = display_instances(original_image, rois, masks, class_ids, class_names)
+
+
+
+
+
+  #open('/output/output.jpg', 'wb').write(image_string)
