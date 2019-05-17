@@ -9,3 +9,6 @@ RUN wget https://s3-us-west-2.amazonaws.com/deepai-object-detection-experiments/
 
 COPY source /model
 COPY test_images test_images
+
+CMD []
+ENTRYPOINT ["python", "run_inference.py"]

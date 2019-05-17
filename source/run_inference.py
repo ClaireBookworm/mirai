@@ -15,6 +15,8 @@ from matplotlib import patches
 from matplotlib.patches import Polygon
 from PIL import Image
 
+import ai_integration
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath(".")
 
@@ -169,7 +171,7 @@ def save_image_in_memory(image, data_format='channels_first'):
     return imgByteArr
 
 
-def process(original_image, model_path, inference_config, class_names, polygon=False):
+def process(original_image_bytes, model_path, inference_config, class_names, polygon=False):
     model = modellib.MaskRCNN(mode="inference",
                               config=inference_config,
                               model_dir='./')
@@ -178,7 +180,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     # print("Loading weights from ", model_path)
     model.load_weights(model_path, by_name=True)
 
-    original_image = Image.open(original_image).convert('RGB')
+    original_image = Image.open(io.BytesIO(original_image_bytes)).convert('RGB')
     unscaled_img = original_image
     original_image = load_image(np.array(original_image), inference_config)
     results = model.detect([original_image], verbose=1)
@@ -314,21 +316,32 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
 
 
 if __name__ == "__main__":
-    test_image_path = 'test_images/test_2.jpg'
-    model_path = 'weights.h5'
-    class_names = ['BG', "Tumor", "Empty1", "Empty2",
-                   "Empty3", "Empty4"]
-    inference_config = InferenceConfig()
-    rois, masks, class_ids, scores, original_image, unscaled_img = process(
-        original_image=test_image_path,
-        model_path=model_path,
-        inference_config=inference_config,
-        class_names=class_names,
-        polygon=False)
-    # print masks
-    # masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
-    # print "masked_image"
-    # print masked_image
-    # image_string = save_image_in_memory(masked_image)
-    png = display_instances(original_image, unscaled_img, rois, masks, class_ids, class_names)
-    open('/output/output.jpg', 'wb').write(png)
+
+    while True:
+        with ai_integration.get_next_input(inputs_schema={
+            "image": {
+                "type": "image"
+            }
+        }) as inputs_dict:
+
+            model_path = 'weights.h5'
+            class_names = ['BG', "Tumor", "Empty1", "Empty2",
+                           "Empty3", "Empty4"]
+            inference_config = InferenceConfig()
+            rois, masks, class_ids, scores, original_image, unscaled_img = process(
+                original_image_bytes=inputs_dict['image'],
+                model_path=model_path,
+                inference_config=inference_config,
+                class_names=class_names,
+                polygon=False)
+
+            png = display_instances(original_image, unscaled_img, rois, masks, class_ids, class_names)
+
+            result_data = {
+                "content-type": 'image/png',
+                "data": png,
+                "success": True,
+                "error": None
+            }
+
+            ai_integration.send_result(result_data)
