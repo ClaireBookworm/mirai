@@ -212,6 +212,8 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
                       figsize=(12.8, 12.8), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None):
+    plt.clf()
+
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
