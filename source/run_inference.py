@@ -175,6 +175,7 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     model.load_weights(model_path, by_name=True)
     
     original_image = Image.open(original_image).convert('RGB')
+    unscaled_img = original_image
     original_image = load_image(np.array(original_image), inference_config)
     results = model.detect([original_image], verbose=1)
 
@@ -197,9 +198,9 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
             resized = convert_mask_to_polygon(resized)
         resized_masks.append(resized)
     """
-    return rois, masks, class_ids, scores, original_image
+    return rois, masks, class_ids, scores, original_image, unscaled_img
   
-def display_instances(image, boxes, masks, class_ids, class_names,
+def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(12.8, 12.8), ax=None,
                       show_mask=True, show_bbox=True,
@@ -286,12 +287,13 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     plt.savefig(buf, format='png')
     buf.seek(0)
     im = Image.open(buf)
+    in_width, out_width = unscaled_img.size
     out_width, out_height = im.size  # Get dimensions
 
-    left = (out_width - width) / 2
-    top = (out_height - height) / 2
-    right = (out_width + width) / 2
-    bottom = (out_height + height) / 2
+    left = (out_width - in_width) / 2
+    top = (out_height - out_width) / 2
+    right = (out_width + in_width) / 2
+    bottom = (out_height + out_width) / 2
 
     im.crop((left, top, right, bottom))
     with io.BytesIO() as output:
@@ -305,7 +307,7 @@ if __name__ == "__main__":
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
   inference_config = InferenceConfig()
-  rois, masks, class_ids, scores, original_image = process(
+  rois, masks, class_ids, scores, original_image, unscaled_img = process(
       original_image=test_image_path,
       model_path=model_path,
       inference_config=inference_config,
@@ -316,5 +318,5 @@ if __name__ == "__main__":
   #print "masked_image"
   #print masked_image
   #image_string = save_image_in_memory(masked_image)
-  png = display_instances(original_image, rois, masks, class_ids, class_names)
+  png = display_instances(original_image, unscaled_img, rois, masks, class_ids, class_names)
   open('/output/output.jpg', 'wb').write(png)
