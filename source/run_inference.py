@@ -287,13 +287,13 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
     plt.savefig(buf, format='png')
     buf.seek(0)
     im = Image.open(buf)
-    in_width, out_width = unscaled_img.size
+    in_width, in_height = unscaled_img.size
     out_width, out_height = im.size  # Get dimensions
 
     left = (out_width - in_width) / 2
-    top = (out_height - out_width) / 2
+    top = (out_height - in_height) / 2
     right = (out_width + in_width) / 2
-    bottom = (out_height + out_width) / 2
+    bottom = (out_height + in_height) / 2
 
     im = im.crop((left, top, right, bottom))
     with io.BytesIO() as output:
