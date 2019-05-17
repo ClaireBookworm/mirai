@@ -299,10 +299,6 @@ if __name__ == "__main__":
       polygon=False)
 
   N = boxes.shape[0]
-  if not N:
-      print("\n*** No instances to display *** \n")
-  else:
-      assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
   polygons = []
 
