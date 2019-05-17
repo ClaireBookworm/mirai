@@ -290,6 +290,9 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
     in_width, in_height = unscaled_img.size
     out_width, out_height = im.size  # Get dimensions
 
+    in_width += 60
+    in_height += 60 # This is horrible
+
     print "in_width {}, in_height {}".format(in_width, in_height)
     print "out_width {}, out_height {}".format(out_width, out_height)
 
