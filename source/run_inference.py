@@ -285,7 +285,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     plt.savefig('/output/output.jpg')
     
 if __name__ == "__main__":
-  test_image_path = 'test_images/test_image4.png'
+  test_image_path = 'test_images/test_2.jpg'
   model_path = 'weights.h5'
   class_names = ['BG', "Tumor", "Empty1", "Empty2",
                     "Empty3", "Empty4"]
