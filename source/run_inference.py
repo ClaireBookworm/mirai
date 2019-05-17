@@ -282,7 +282,23 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.savefig('/output/output.jpg')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    im = Image.open(buf)
+    orig_width, orig_height = image.size
+    width, height = im.size  # Get dimensions
+
+    left = (width - orig_width) / 2
+    top = (height - orig_height) / 2
+    right = (width + orig_width) / 2
+    bottom = (height + orig_height) / 2
+
+    im.crop((left, top, right, bottom))
+    with io.BytesIO() as output:
+        image.save(output, format="PNG")
+        return output.getvalue()
+
     
 if __name__ == "__main__":
   test_image_path = 'test_images/test_2.jpg'
@@ -301,5 +317,5 @@ if __name__ == "__main__":
   #print "masked_image"
   #print masked_image
   #image_string = save_image_in_memory(masked_image)
-  display_instances(original_image, rois, masks, class_ids, class_names)
-  #open('/output/output.jpg', 'wb').write(image_string)
+  png = display_instances(original_image, rois, masks, class_ids, class_names)
+  open('/output/output.jpg', 'wb').write(png)
