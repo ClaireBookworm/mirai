@@ -184,19 +184,18 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
     class_ids = r['class_ids']
 
     scores = r['scores']
-    """
+
     print 'num detections:', len(class_names)
-    for k, score in zip(r['class_ids'], r['scores']):
-        print k,dataset.class_names[k],':',score
+    #for k, score in zip(r['class_ids'], r['scores']):
+        #print k,dataset.class_names[k],':',score
     
     
     resized_masks = []
     for i in range(r['masks'].shape[-1]):
         resized = np.array(utils.resize(r['masks'][:,:,i], original_image.shape), dtype=np.int)
-        if polygon:
-            resized = convert_mask_to_polygon(resized)
+
         resized_masks.append(resized)
-    """
+
     return rois, masks, class_ids, scores, original_image
   
 def display_instances(image, boxes, masks, class_ids, class_names,
