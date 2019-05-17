@@ -3,17 +3,18 @@ import io
 import os
 import random
 import sys
+
 import matplotlib
+
 matplotlib.use('Agg')
 import numpy as np
-import skimage
 from skimage.measure import find_contours
 
-
 import matplotlib.pyplot as plt
-from matplotlib import patches,  lines
+from matplotlib import patches
 from matplotlib.patches import Polygon
-from PIL import  Image
+from PIL import Image
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath(".")
 
@@ -21,19 +22,20 @@ ROOT_DIR = os.path.abspath(".")
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from config import Config
 import utils
-#import mrcnn.model as modellib
+# import mrcnn.model as modellib
 
 import mask_rcnn as modellib
-from mask_rcnn import load_image_gt
 
 from scipy.misc import imsave
 
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
+
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.2
 sess = tf.Session(config=config)
 set_session(sess)  # set this TensorFlow session as the default session for Keras
+
 
 def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
@@ -62,7 +64,7 @@ def random_colors(N, bright=True):
 def make_masked_image(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
-                      show_mask=True, 
+                      show_mask=True,
                       colors=None, ):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
@@ -74,24 +76,24 @@ def make_masked_image(image, boxes, masks, class_ids, class_names,
     """
     # Number of instances
     try:
-        N =  len(masks)
+        N = len(masks)
     except:
         print("\n*** No instances to display *** \n")
 
-
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
-        color = [1,0,0]
+        color = [1, 0, 0]
         if class_ids[i] == 1:
             mask = np.array(masks[i])
             print mask.shape
             if show_mask:
-               masked_image = apply_mask(masked_image, mask, color)
+                masked_image = apply_mask(masked_image, mask, color)
 
     return masked_image
-  
+
+
 def load_image(image, config, augment=False, augmentation=None,
-                  use_mini_mask=False, debug=False):
+               use_mini_mask=False, debug=False):
     """Load and return ground truth data for an image (image, mask, bounding boxes).
     augment: (deprecated. Use augmentation instead). If true, apply random
         image augmentation. Currently, only horizontal flipping is offered.
@@ -124,6 +126,7 @@ def load_image(image, config, augment=False, augmentation=None,
 
     return image
 
+
 class InferenceConfig(Config):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
@@ -133,7 +136,7 @@ class InferenceConfig(Config):
     BATCH_SIZE = 1
     NAME = 'test'
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 5 # background + 5 shapes
+    NUM_CLASSES = 1 + 5  # background + 5 shapes
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -141,39 +144,40 @@ class InferenceConfig(Config):
     IMAGE_MAX_DIM = 1024
 
     # Use smaller anchors because our image and objects are small
-    #RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
+    # RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
     RPN_ANCHOR_SCALES = (12, 32, 80, 196, 480)
-    
+
+
 inference_config = InferenceConfig()
 
 class_names = ['BG', "Tumor", "Empty1", "Empty2",
-                    "Empty3", "Empty4"]
-
+               "Empty3", "Empty4"]
 
 inference_config = InferenceConfig()
 
-
 model_path = 'weights.h5'
 
+
 def save_image_in_memory(image, data_format='channels_first'):
-   if data_format == 'channels_first':
-       image = np.transpose(image, [1, 2, 0])  # CHW --> HWC
-   image *= 255
-   image = np.clip(image, 0, 255)
-   imgByteArr = io.BytesIO()
-   imsave(imgByteArr, image.astype(np.uint8), 'JPEG')
-   imgByteArr = imgByteArr.getvalue()
-   return imgByteArr
-  
+    if data_format == 'channels_first':
+        image = np.transpose(image, [1, 2, 0])  # CHW --> HWC
+    image *= 255
+    image = np.clip(image, 0, 255)
+    imgByteArr = io.BytesIO()
+    imsave(imgByteArr, image.astype(np.uint8), 'JPEG')
+    imgByteArr = imgByteArr.getvalue()
+    return imgByteArr
+
+
 def process(original_image, model_path, inference_config, class_names, polygon=False):
-    model = modellib.MaskRCNN(mode="inference", 
-                                  config=inference_config,
-                                  model_dir='./')
+    model = modellib.MaskRCNN(mode="inference",
+                              config=inference_config,
+                              model_dir='./')
 
     # Load trained weights
-    #print("Loading weights from ", model_path)
+    # print("Loading weights from ", model_path)
     model.load_weights(model_path, by_name=True)
-    
+
     original_image = Image.open(original_image).convert('RGB')
     unscaled_img = original_image
     original_image = load_image(np.array(original_image), inference_config)
@@ -199,7 +203,8 @@ def process(original_image, model_path, inference_config, class_names, polygon=F
         resized_masks.append(resized)
     """
     return rois, masks, class_ids, scores, original_image, unscaled_img
-  
+
+
 def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(12.8, 12.8), ax=None,
@@ -251,8 +256,8 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
         y1, x1, y2, x2 = boxes[i]
         if show_bbox:
             p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
-                                alpha=0.7, linestyle="dashed",
-                                edgecolor=color, facecolor='none')
+                                  alpha=0.7, linestyle="dashed",
+                                  edgecolor=color, facecolor='none')
             ax.add_patch(p)
 
         # Label
@@ -291,7 +296,7 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
     out_width, out_height = im.size  # Get dimensions
 
     in_width += 60
-    in_height += 60 # This is horrible
+    in_height += 60  # This is horrible
 
     print "in_width {}, in_height {}".format(in_width, in_height)
     print "out_width {}, out_height {}".format(out_width, out_height)
@@ -307,23 +312,23 @@ def display_instances(image, unscaled_img, boxes, masks, class_ids, class_names,
         im.save(output, format="PNG")
         return output.getvalue()
 
-    
+
 if __name__ == "__main__":
-  test_image_path = 'test_images/test_2.jpg'
-  model_path = 'weights.h5'
-  class_names = ['BG', "Tumor", "Empty1", "Empty2",
-                    "Empty3", "Empty4"]
-  inference_config = InferenceConfig()
-  rois, masks, class_ids, scores, original_image, unscaled_img = process(
-      original_image=test_image_path,
-      model_path=model_path,
-      inference_config=inference_config,
-      class_names=class_names,
-      polygon=False)
-  #print masks
-  #masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
-  #print "masked_image"
-  #print masked_image
-  #image_string = save_image_in_memory(masked_image)
-  png = display_instances(original_image, unscaled_img, rois, masks, class_ids, class_names)
-  open('/output/output.jpg', 'wb').write(png)
+    test_image_path = 'test_images/test_2.jpg'
+    model_path = 'weights.h5'
+    class_names = ['BG', "Tumor", "Empty1", "Empty2",
+                   "Empty3", "Empty4"]
+    inference_config = InferenceConfig()
+    rois, masks, class_ids, scores, original_image, unscaled_img = process(
+        original_image=test_image_path,
+        model_path=model_path,
+        inference_config=inference_config,
+        class_names=class_names,
+        polygon=False)
+    # print masks
+    # masked_image = make_masked_image(original_image, boxes=rois, masks=masks, class_ids=class_ids, class_names=class_names)
+    # print "masked_image"
+    # print masked_image
+    # image_string = save_image_in_memory(masked_image)
+    png = display_instances(original_image, unscaled_img, rois, masks, class_ids, class_names)
+    open('/output/output.jpg', 'wb').write(png)
