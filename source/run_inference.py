@@ -295,7 +295,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
     im.crop((left, top, right, bottom))
     with io.BytesIO() as output:
-        image.save(output, format="PNG")
+        im.save(output, format="PNG")
         return output.getvalue()
 
     
