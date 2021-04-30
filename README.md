@@ -1,6 +1,6 @@
 # MIRAI
 
-A Mask R-CNN that analyzes brain tumors and locates them. 
+A Mask R-CNN that analyzes brain tumors and locates them, labeling the type and confidence level, using meta learning.
 
 ![Mask RCNN](https://i.ytimg.com/vi/OOT3UIXZztE/maxresdefault.jpg)
 
